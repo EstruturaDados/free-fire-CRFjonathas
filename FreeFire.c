@@ -8,7 +8,26 @@
 // Este programa simula o gerenciamento avançado de uma mochila com componentes coletados durante a fuga de uma ilha.
 // Ele introduz ordenação com critérios e busca binária para otimizar a gestão dos recursos.
 
+#define QNT_ITENS 10
+
+typedef struct {
+    char nome[30];
+    char tipo[20];
+    int quantidade;
+} Item;
+
+Item mochila[QNT_ITENS];
+int numItens = 0;
+
+void Menu();
+
+void AdicionarItem();
+void RemoverItem();
+void ListarItem();
+
 int main() {
+
+    
     // Menu principal com opções:
     // 1. Adicionar um item
     // 2. Remover um item
@@ -19,6 +38,38 @@ int main() {
 
     // A estrutura switch trata cada opção chamando a função correspondente.
     // A ordenação e busca binária exigem que os dados estejam bem organizados.
+    
+    int opcao;
+
+    do {
+        Menu();
+        printf("Escolha uma opcao: ");
+        scanf("%d", &opcao);
+        getchar(); // Limpar buffer do teclado
+
+        switch (opcao) {
+            case 1:
+                AdicionarItem();
+                break;
+            case 2:
+                RemoverItem();
+                break;
+            case 3:
+                ListarItens();
+                break;
+            case 0:
+                printf("Saindo do inventario...\n");
+                break;
+            default:
+                printf("Opcao invalida!\n");
+        }
+        
+        if (opcao != 0) {
+            printf("\nPressione ENTER para continuar...");
+            getchar();
+        }
+
+    } while (opcao != 0);
 
     return 0;
 }
@@ -68,3 +119,87 @@ int main() {
 // Realiza busca binária por nome, desde que a mochila esteja ordenada por nome.
 // Se encontrar, exibe os dados do item buscado.
 // Caso contrário, informa que não encontrou o item.
+
+void Menu() {
+    // system("cls"); // Use "clear" no Linux/Mac se preferir limpar a tela
+    printf("\n=== MOCHILA FREE FIRE (Nivel Novato) ===\n");
+    printf("1. Adicionar Item\n");
+    printf("2. Remover Item\n");
+    printf("3. Listar Itens\n");
+    printf("0. Sair\n");
+    printf("========================================\n");
+}
+
+void AdicionarItem() {
+    if (numItens >= QNT_ITENS) {
+        printf("\nA mochila esta cheia! Remova um item antes de adicionar outro.\n");
+        return;
+    }
+
+    Item novoItem;
+
+    printf("\n--- Adicionar Novo Item ---\n");
+    
+    printf("Nome: ");
+    scanf(" %[^\n]", novoItem.nome); // Lê string com espaços
+    
+    printf("Tipo (ex: Arma, Municao, Cura): ");
+    scanf(" %[^\n]", novoItem.tipo);
+    
+    printf("Quantidade: ");
+    scanf("%d", &novoItem.quantidade);
+    getchar(); // Limpar buffer após ler inteiro
+
+    // Salva no vetor e incrementa o contador
+    mochila[numItens] = novoItem;
+    numItens++;
+
+    printf("Item cadastrado com sucesso!\n");
+}
+
+void RemoverItem() {
+    if (numItens == 0) {
+        printf("\nA mochila esta vazia.\n");
+        return;
+    }
+
+    char nomeBusca[30];
+    int encontrado = 0;
+
+    printf("\n--- Remover Item ---\n");
+    printf("Informe o nome do item para remover: ");
+    scanf(" %[^\n]", nomeBusca);
+
+    for (int i = 0; i < numItens; i++) {
+        if (strcmp(mochila[i].nome, nomeBusca) == 0) {
+            // Item encontrado. Deslocar os itens seguintes para "tapar o buraco"
+            for (int j = i; j < numItens - 1; j++) {
+                mochila[j] = mochila[j + 1];
+            }
+            
+            numItens--; // Diminui a quantidade total
+            encontrado = 1;
+            printf("Item '%s' removido com sucesso!\n", nomeBusca);
+            break; // Sai do loop pois já removeu
+        }
+    }
+
+    if (!encontrado) {
+        printf("Item nao encontrado na mochila.\n");
+    }
+}
+
+void ListarItens() {
+    if (numItens == 0) {
+        printf("\nA mochila esta vazia.\n");
+        return;
+    }
+
+    printf("\n--- Conteudo da Mochila (%d/%d) ---\n", numItens, QNT_ITENS);
+    printf("%-30s | %-20s | %s\n", "NOME", "TIPO", "QTD");
+    printf("---------------------------------------------------------------\n");
+
+    for (int i = 0; i < numItens; i++) {
+        printf("%-30s | %-20s | %d\n", mochila[i].nome, mochila[i].tipo, mochila[i].quantidade);
+    }
+}
